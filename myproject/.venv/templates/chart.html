@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Timeline Chart Export</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-timeline@4.1.0"></script>
+</head>
+<body>
+  <button onclick="downloadChart()">Download Timeline Chart</button>
+  <canvas id="timelineChart" width="1000" height="500"></canvas>
+
+  <script>
+    const ctx = document.getElementById('timelineChart').getContext('2d');
+
+    const data = {
+      datasets: [{
+        label: "Find-A-Spot Project Timeline",
+        data: [
+          { x: ["2025-03-25", "2025-03-30"], y: "Planning & Analysis" },
+          { x: ["2025-03-31", "2025-04-13"], y: "Increment 1: Core Features" },
+          { x: ["2025-04-14", "2025-04-27"], y: "Increment 2: AI & Payments" },
+          { x: ["2025-04-28", "2025-05-11"], y: "Increment 3: Admin & Optimization" },
+          { x: ["2025-05-12", "2025-05-25"], y: "Final Testing & Documentation" },
+          { x: ["2025-04-13", "2025-04-13"], y: "Milestone: Prototype" },
+          { x: ["2025-04-27", "2025-04-27"], y: "Milestone: Refined System" },
+          { x: ["2025-05-25", "2025-05-25"], y: "Milestone: Final Delivery" }
+        ],
+        backgroundColor: "rgba(75, 192, 192, 0.8)",
+        borderColor: "rgba(75, 192, 192, 1)",
+        borderWidth: 1
+      }]
+    };
+
+    const config = {
+      type: 'timeline',
+      data: data,
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        scales: {
+          x: {
+            type: 'time',
+            min: "2025-03-25",
+            max: "2025-05-25",
+            time: {
+              unit: 'day',
+              tooltipFormat: 'MMM d'
+            },
+            title: {
+              display: true,
+              text: 'Timeline (March 25, 2025 - May 25, 2025)'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Tasks and Milestones'
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Find-A-Spot Project Timeline'
+          }
+        }
+      }
+    };
+
+    new Chart(ctx, config);
+
+    function downloadChart() {
+      const link = document.createElement('a');
+      link.download = 'timeline_chart.png';
+      link.href = document.getElementById('timelineChart').toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>
