@@ -1,0 +1,100 @@
+# Docker Compose for FindASpot - yahan par complete application stack hai
+version: '3.8'
+
+services:
+  # MySQL Database Service - yahan par database container hai
+  mysql:
+    image: mysql:8.0
+    container_name: findaspot-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-findaspot}
+      MYSQL_USER: ${DB_USER:-findaspot_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password123}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/src/main/resources/db/migration:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+    networks:
+      - findaspot-network
+
+  # Backend Service - yahan par Spring Boot application hai
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: findaspot-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Database Configuration
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-findaspot}
+      DB_USER: ${DB_USER:-findaspot_user}
+      DB_PASSWORD: ${DB_PASSWORD:-password123}
+      
+      # SMTP Configuration
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM:-noreply@findaspot.com}
+      SMTP_USE_TLS: ${SMTP_USE_TLS:-true}
+      
+      # Security Configuration
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      
+      # Spring Profiles
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/auth/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - findaspot-network
+
+  # Frontend Service - yahan par React application hai  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: findaspot-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080/api
+    ports:
+      - "3000:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - findaspot-network
+
+# Volume definitions - yahan par persistent storage hai
+volumes:
+  mysql_data:
+    driver: local
+
+# Network definitions - yahan par container networking hai
+networks:
+  findaspot-network:
+    driver: bridge
