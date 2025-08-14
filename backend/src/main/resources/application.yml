@@ -1,0 +1,61 @@
+# FindASpot Backend Configuration
+# yahan par main application ki settings hain
+
+server:
+  port: 8080
+
+spring:
+  # Database configuration - yahan par database connection settings hain
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:findaspot}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  # JPA configuration - yahan par hibernate settings hain
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+  
+  # Flyway migration configuration - yahan par database migration settings hain
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  
+  # Mail configuration - yahan par email settings hain
+  mail:
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: ${SMTP_USE_TLS:true}
+            required: true
+
+# Application specific configuration - yahan par custom settings hain
+findaspot:
+  app:
+    jwt-secret: ${JWT_SECRET:default-secret-key-change-in-production}
+    jwt-expiration-ms: 86400000 # 24 hours
+  mail:
+    from: ${SMTP_FROM:noreply@findaspot.com}
+  otp:
+    expiry-minutes: 10
+    max-attempts: 3
+
+# Logging configuration - yahan par log settings hain
+logging:
+  level:
+    com.findaspot: INFO
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
