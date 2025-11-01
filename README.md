@@ -24,3 +24,35 @@ FindASpot is a full-stack smart parking solution for commercial and residential 
 
 ## Getting Started
 
+```
+# Clone the repository
+git clone https://github.com/KoushalShrma/FindASpot.git
+cd FindASpot/myproject
+
+# (Optional) Create a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the application
+python .venv/flask1.py
+```
+
+Access the interface at: `http://localhost:5000/`
+
+## File Structure
+
+- `.venv/` - contains main backend (Flask app and templates)
+- `static/`, `uploads/` - assets and user-uploaded files
+
+## Contribution
+
+Feel free to fork, open an issue, or submit a pull request to help expand FindASpot.
+
+---
+
+Made with ❤️ by [Koushal Sharma](https://www.koushal.me/)
+
+```
